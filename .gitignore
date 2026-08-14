@@ -43,6 +43,8 @@ bridge/watcher.lock
 bridge/watcher.out
 bridge/watcher.env
 bridge/dashboard.token
+bridge/publisher.out
+bridge/publisher.log
 
 # --- session / working docs: live in the temp work dir, NOT the repo ---
 /BUZZ_DEPLOYMENT_STATUS.md
