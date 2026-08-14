@@ -27,6 +27,7 @@ import subprocess
 import sys
 import time
 import traceback
+from typing import Optional
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -97,11 +98,16 @@ def parse_summary(stdout: str) -> dict:
     return {}
 
 
-def fetch_audit(cfg: dict, channel_id: str) -> tuple[list[str], list[str]]:
+def fetch_audit(cfg: dict, channel_id: str,
+                task_ids: Optional[set[str]] = None) -> tuple[list[str], list[str]]:
     """
     Best-effort: read the signed event trail for the channel via buzz-cli.
     Returns (audit_lines, failure_details) — the latter pulls any `error` fields
     the workers posted, so a failed job is diagnosable from the report alone.
+
+    All jobs share one Buzz channel, so `task_ids` scopes the trail to THIS job.
+    Without it, a report would inherit unrelated (often long-resolved) errors from
+    earlier jobs in the same channel window.
     """
     nsec = queen_nsec(cfg)
     if not channel_id or not nsec or not shutil.which("buzz"):
@@ -126,6 +132,9 @@ def fetch_audit(cfg: dict, channel_id: str) -> tuple[list[str], list[str]]:
             env_obj = {}
         t = env_obj.get("type", "?")
         tid = env_obj.get("task_id", "")
+        # Scope to this job's tasks; the channel is shared by every job.
+        if task_ids and tid not in task_ids:
+            continue
         extra = env_obj.get("status") or env_obj.get("decision") or ""
         err = env_obj.get("error")
         line = f"{ts}  {t:<9} task={tid:<20} {extra:<12} pubkey={pk}…"
@@ -182,7 +191,16 @@ def run_job(cfg: dict, job_path: Path) -> None:
             problem, reason = True, f"watcher error: {e}"
 
     channel_id = summary.get("channel_id", "")
-    audit, failures = fetch_audit(cfg, channel_id) if channel_id else ([], [])
+    # Only this job's task_ids — from the run summary, falling back to the spec.
+    job_task_ids = set((summary.get("results") or {}).keys())
+    if not job_task_ids:
+        try:
+            job_task_ids = {j.get("task_id") for j in (spec or {}).get("jobs", [])
+                            if j.get("task_id")}
+        except Exception:  # noqa: BLE001
+            job_task_ids = set()
+    audit, failures = (fetch_audit(cfg, channel_id, job_task_ids)
+                       if channel_id else ([], []))
     report = render_report(name, started, problem, reason, njobs, summary, audit,
                            failures, stdout, stderr)
 
