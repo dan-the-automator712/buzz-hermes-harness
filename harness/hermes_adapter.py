@@ -30,6 +30,7 @@ import json
 import os
 import shlex
 import subprocess
+import tempfile
 from dataclasses import dataclass
 from typing import Optional
 
@@ -37,10 +38,10 @@ from typing import Optional
 @dataclass
 class HermesConfig:
     backend: str = "hermes_cli"          # "hermes_cli" | "openai_compat"
-    model: str = "deepseek-v4-flash-0731"
-    # hermes_cli: a shell template. {prompt_file} holds the turn prompt; {model}
-    # is substituted. Verify the flag against your `hermes --help`.
-    cli_template: str = "hermes run --model {model} --no-interactive --input {prompt_file}"
+    model: str = "deepseek/deepseek-v4-flash-0731"
+    # hermes_cli: a shell template. {prompt} holds the turn prompt; {model}
+    # is substituted. This Hermes build uses top-level `hermes -m MODEL -z PROMPT`.
+    cli_template: str = "hermes -m {model} -z {prompt}"
     cli_timeout: int = 600
     # openai_compat: hosted provider serving deepseek-v4-flash-0731
     base_url: str = "https://openrouter.ai/api/v1"   # or your provider's URL
@@ -55,6 +56,40 @@ class HermesError(RuntimeError):
 class HermesAdapter:
     def __init__(self, cfg: HermesConfig):
         self.cfg = cfg
+        # Real token accounting for the most recent turn. Shape (contract):
+        #   {"input_tokens": int, "output_tokens": int, "cache_tokens": int,
+        #    "billable_tokens": int, "total_tokens": int,
+        #    "api_calls": int, "cost_usd": float, "exact": bool}
+        self.last_usage: Optional[dict] = None
+
+    @staticmethod
+    def _usage_inputs(input_tokens=0, output_tokens=0, total_tokens=0,
+                      cache_tokens=0, api_calls=0, cost_usd=0.0, exact=False) -> dict:
+        """Build the canonical usage contract dict.
+
+        `cache_tokens` is the sum of cache read + cache write tokens (may be 0).
+        `billable_tokens` = input + output (excludes cache, so a "tokens used"
+        counter climbs with real spend, not with the cache-inflated total).
+        `total_tokens` is kept exactly as hermes reports it (includes cache).
+        """
+        return {
+            "input_tokens": int(input_tokens),
+            "output_tokens": int(output_tokens),
+            "cache_tokens": int(cache_tokens),
+            "billable_tokens": int(input_tokens) + int(output_tokens),
+            "total_tokens": int(total_tokens),
+            "api_calls": int(api_calls),
+            "cost_usd": float(cost_usd),
+            "exact": bool(exact),
+        }
+
+    def pop_last_usage(self) -> dict:
+        """Return the last turn's usage and clear it."""
+        usage = self.last_usage
+        self.last_usage = None
+        if usage is None:
+            return self._usage_inputs()
+        return usage
 
     def run_turn(self, prompt: str, workdir: Optional[str] = None) -> str:
         if self.cfg.backend == "hermes_cli":
@@ -74,18 +109,53 @@ class HermesAdapter:
         argv = shlex.split(head) if head.strip() else []
         argv.append(prompt)                       # prompt = exactly one argv element
         argv += shlex.split(tail) if tail.strip() else []
-        proc = subprocess.run(
-            argv,
-            capture_output=True,
-            text=True,
-            cwd=workdir,
-            timeout=self.cfg.cli_timeout,
-        )
-        if proc.returncode != 0:
-            raise HermesError(
-                f"hermes exited {proc.returncode}: {proc.stderr.strip() or proc.stdout.strip()}"
+        # Real token accounting: ask hermes to write a per-run usage JSON.
+        usage_path = None
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="w", suffix=".json", delete=False
+            ) as tf:
+                usage_path = tf.name
+            argv += ["--usage-file", usage_path]
+            proc = subprocess.run(
+                argv,
+                capture_output=True,
+                text=True,
+                cwd=workdir,
+                timeout=self.cfg.cli_timeout,
             )
-        return proc.stdout.strip()
+            if proc.returncode != 0:
+                raise HermesError(
+                    f"hermes exited {proc.returncode}: {proc.stderr.strip() or proc.stdout.strip()}"
+                )
+            self._record_cli_usage(usage_path)
+            return proc.stdout.strip()
+        finally:
+            if usage_path is not None:
+                try:
+                    os.unlink(usage_path)
+                except OSError:
+                    pass
+
+    def _record_cli_usage(self, usage_path: str) -> None:
+        """Parse the --usage-file JSON into the contract shape (best-effort)."""
+        try:
+            with open(usage_path, "r", encoding="utf-8") as fh:
+                data = json.load(fh)
+            cache_tokens = int(data.get("cache_read_tokens") or 0) \
+                + int(data.get("cache_write_tokens") or 0)
+            self.last_usage = self._usage_inputs(
+                input_tokens=data.get("input_tokens") or 0,
+                output_tokens=data.get("output_tokens") or 0,
+                total_tokens=data.get("total_tokens") or 0,
+                cache_tokens=cache_tokens,
+                api_calls=data.get("api_calls") or 0,
+                cost_usd=data.get("estimated_cost_usd") or 0.0,
+                exact=True,
+            )
+        except (OSError, ValueError, TypeError):
+            # Missing or unparseable -> zeros, flagged inexact.
+            self.last_usage = self._usage_inputs()
 
     # --- backend: hosted OpenAI-compatible endpoint ----------------------
 
@@ -114,4 +184,17 @@ class HermesAdapter:
         if resp.status_code >= 400:
             raise HermesError(f"model endpoint {resp.status_code}: {resp.text[:400]}")
         data = resp.json()
+        # Real usage from the API response `usage` object if present.
+        u = data.get("usage") or {}
+        if isinstance(u, dict) and u:
+            self.last_usage = self._usage_inputs(
+                input_tokens=u.get("prompt_tokens") or 0,
+                output_tokens=u.get("completion_tokens") or 0,
+                total_tokens=u.get("total_tokens") or 0,
+                api_calls=1,
+                cost_usd=0.0,
+                exact=True,
+            )
+        else:
+            self.last_usage = self._usage_inputs()
         return data["choices"][0]["message"]["content"].strip()

@@ -192,7 +192,8 @@ def main() -> int:
             tid = futures[fut]
             try:
                 res = fut.result()
-                results[tid] = {"status": res.status, "turns": res.turns_used}
+                results[tid] = {"status": res.status, "turns": res.turns_used,
+                                "usage": res.usage}
                 print(f"[queen] {tid}: {res.status} in {res.turns_used} turn(s)")
             except Exception as e:  # noqa: BLE001
                 results[tid] = {"status": "error", "error": str(e)}
@@ -215,7 +216,8 @@ def main() -> int:
                 for fut in cf.as_completed(futures):
                     tid = futures[fut]
                     res = fut.result()
-                    results[tid] = {"status": res.status, "turns": res.turns_used, "extended": True}
+                    results[tid] = {"status": res.status, "turns": res.turns_used,
+                                    "extended": True, "usage": res.usage}
                     print(f"[queen] {tid} (extended): {res.status} in {res.turns_used} turn(s)")
 
     summary = {"channel_id": channel_id, "ts": int(time.time()), "results": results}

@@ -22,7 +22,7 @@ Endpoints:
     GET  /api/jobs/<name>              one job resolved from snapshot history/running/queued
                                        (history entries already carry report_markdown)
 
-Auth:  all /api/* require `Authorization: Bearer DASH_TOKEN` or `?token=<DASH_TOKEN>`
+Auth:  all /api/* require `Authorization: Bearer *** or `?token=<DASH_TOKEN>`
        compared in constant time (hmac.compare_digest). CORS + OPTIONS preflight supported.
        If no snapshot received yet, /api/* return 503 {"error":"no snapshot yet"}.
 
@@ -44,6 +44,7 @@ from urllib.parse import parse_qs, urlparse
 
 BIND = os.environ.get("DASH_BIND", "0.0.0.0")
 PORT = int(os.environ.get("DASH_PORT", "8787"))
+DASH_REFRESH_SECONDS = int(os.environ.get("DASH_REFRESH_SECONDS", "60"))
 
 # Auth tokens (both required for full function).
 TOKEN = os.environ.get("DASH_TOKEN", "")               # clients reading /api/*
@@ -143,22 +144,36 @@ details summary{cursor:pointer;color:var(--acc)}pre{white-space:pre-wrap;backgro
 #tok{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center}
 #tok .card{width:340px}input{width:100%;padding:8px;border-radius:6px;border:1px solid #2a3242;background:#10141c;color:var(--txt)}
 button{margin-top:10px;padding:8px 14px;border-radius:6px;border:0;background:var(--acc);color:#fff;cursor:pointer}
+#ctrl{display:flex;align-items:center;gap:8px;margin:6px 0 14px;color:var(--dim);font-size:12px;flex-wrap:wrap}
+#ctrl select{padding:3px 6px;border-radius:6px;border:1px solid #2a3242;background:#10141c;color:var(--txt);font-size:12px}
+#ctrl button{margin-top:0;padding:3px 12px;font-size:12px}#countdown{min-width:120px}
 </style></head><body>
 <div id="tok" style="display:none"><div class="card"><h1>API token</h1>
 <p class="sub">Enter the dashboard token (DASH_TOKEN).</p>
 <input id="tokin" type="password" placeholder="token"><button onclick="saveTok()">Connect</button></div></div>
 <h1><span id="hb"></span>Buzz × Hermes — Bridge Dashboard</h1>
 <div class="sub" id="meta">connecting…</div>
+<div id="ctrl">Auto-refresh <select id="refresh"><option value="10">10s</option><option value="30">30s</option><option value="60">60s</option><option value="300">300s</option></select><span id="countdown"></span><button id="refreshbtn">Refresh</button></div>
 <div class="stats" id="stats" style="margin-top:14px"></div>
-<h2>Running</h2><div class="card"><table id="run"><thead><tr><th>Job</th><th>Tasks</th><th>Worker pool</th><th>Started</th><th>Elapsed</th><th>Next update (est.)</th><th>Timeout at</th></tr></thead><tbody></tbody></table></div>
+<h2>Running</h2><div class="card"><table id="run"><thead><tr><th>Job</th><th>Tasks</th><th>Worker pool</th><th>Started</th><th>Elapsed</th><th>Next update (est.)</th><th>Timeout at</th><th>Tokens (M)</th></tr></thead><tbody></tbody></table></div>
 <h2>Queued</h2><div class="card"><table id="qd"><thead><tr><th>Job</th><th>Tasks</th><th>Queued at</th><th>Waiting</th></tr></thead><tbody></tbody></table></div>
-<h2>History (audit)</h2><div class="card"><table id="hist"><thead><tr><th>Job</th><th>Outcome</th><th>Tasks (status · turns · worker)</th><th>Started</th><th>Duration</th><th>Reason</th><th>Report</th></tr></thead><tbody></tbody></table></div>
+<h2>History (audit)</h2><div class="card"><table id="hist"><thead><tr><th>Job</th><th>Outcome</th><th>Tasks (status · turns · worker)</th><th>Started</th><th>Duration</th><th>Tokens (M)</th><th>Reason</th><th>Report</th></tr></thead><tbody></tbody></table></div>
 <script>
 let T=localStorage.getItem('dash_token')||'';
+const REFRESH_OPTS=[10,30,60,300];
+const REFRESH_DEFAULT=__REFRESH_DEFAULT__;
+let refreshSecs=parseInt(localStorage.getItem('dash_refresh'))||REFRESH_DEFAULT;
+if(!REFRESH_OPTS.includes(refreshSecs))refreshSecs=REFRESH_DEFAULT;
+let countdown=0,refreshTimer=null,countTimer=null;
 function saveTok(){T=document.getElementById('tokin').value.trim();localStorage.setItem('dash_token',T);document.getElementById('tok').style.display='none';tick();}
 function needTok(){document.getElementById('tok').style.display='flex';}
 function fmts(s){if(s==null)return'—';if(s<90)return s+'s';if(s<5400)return Math.round(s/60)+'m '+(s%60)+'s';return (s/3600).toFixed(1)+'h';}
 function esc(x){return (''+(x??'')).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function tokM(v){return (v||0).toFixed(4)+'M';}
+function tokCell(t){if(!t)return'<td class="dim">—</td>';const tilde=t.exact===false?' <span title="estimated">~</span>':'';return'<td class="mono">'+tokM(t.input_m)+' in / '+tokM(t.output_m)+' out'+tilde+'</td>';}
+function runTokCell(j){if(!j.has_usage)return'<td class="dim">—</td>';const t=j.usage_totals||{};const tilde=t.exact===false?' <span title="estimated">~</span>':'';return'<td class="mono">'+tokM(t.input_m)+' in / '+tokM(t.output_m)+' out'+tilde+'</td>';}
+function setRefresh(){refreshSecs=parseInt(document.getElementById('refresh').value);localStorage.setItem('dash_refresh',refreshSecs);restartCountdown();}
+function restartCountdown(){countdown=refreshSecs;const cd=document.getElementById('countdown');if(cd)cd.textContent='next refresh in '+refreshSecs+'s';if(refreshTimer)clearInterval(refreshTimer);refreshTimer=setInterval(tick,refreshSecs*1000);if(countTimer)clearInterval(countTimer);countTimer=setInterval(()=>{countdown--;const cd=document.getElementById('countdown');if(cd)cd.textContent='next refresh in '+Math.max(0,countdown)+'s';},1000);}
 async function tick(){
  if(!T){needTok();return;}
  let r;try{r=await fetch('/api/all',{headers:{Authorization:'Bearer '+T}});}catch(e){document.getElementById('meta').textContent='fetch failed: '+e;return;}
@@ -169,14 +184,31 @@ async function tick(){
  const stale=age!=null&&age>30;
  document.getElementById('hb').style.background=stale?'var(--bad)':'var(--ok)';
  document.getElementById('meta').textContent='watcher '+(d.watcher.alive?'alive':'STALE')+' · state '+(d.watcher.state||'?')+' · snapshot age '+(age==null?'—':fmts(age))+((stale)?' · <b>STALE</b>':'')+' · heartbeat '+(d.watcher.updated||'?')+' · received '+(d.snapshot_received_at||'?');
- document.getElementById('stats').innerHTML=['total_completed','ok','problems','avg_duration_seconds'].map(k=>'<div class="stat"><div class="n">'+(k==='avg_duration_seconds'?fmts(d.stats[k]):d.stats[k])+'</div><div class="sub">'+k.replaceAll('_',' ')+'</div></div>').join('');
- document.querySelector('#run tbody').innerHTML=d.running.length?d.running.map(j=>'<tr><td class="mono">'+esc(j.job)+' <span class="b run">running</span></td><td>'+j.tasks.map(t=>esc(t.task_id)).join('<br>')+'</td><td>'+j.assigned_pool.join(', ')+'</td><td class="mono">'+esc(j.started_at)+'</td><td>'+fmts(j.elapsed_seconds)+'</td><td class="mono">'+esc(j.next_status_update_expected)+'</td><td class="mono dim">'+esc(j.timeout_at)+'</td></tr>').join(''):'<tr><td colspan="7" class="dim">nothing running</td></tr>';
+ const tk=d.stats&&d.stats.tokens?d.stats.tokens:{billable_m:0,total_m:0,cost_usd:0};
+ const statCards=[
+  {l:'total completed',v:d.stats.total_completed},
+  {l:'ok',v:d.stats.ok},
+  {l:'problems',v:d.stats.problems},
+  {l:'avg duration',v:fmts(d.stats.avg_duration_seconds)},
+  {l:'Tokens I/O (M)',v:tokM(tk.billable_m)},
+  {l:'Cache (M)',v:tokM(tk.cache_m)},
+  {l:'est. cost (usd)',v:'$'+(tk.cost_usd||0).toFixed(4)},
+ ];
+ document.getElementById('stats').innerHTML=statCards.map(s=>'<div class="stat"><div class="n">'+s.v+'</div><div class="sub">'+s.l+'</div></div>').join('');
+ document.querySelector('#run tbody').innerHTML=d.running.length?d.running.map(j=>'<tr><td class="mono">'+esc(j.job)+' <span class="b run">running</span></td><td>'+j.tasks.map(t=>esc(t.task_id)).join('<br>')+'</td><td>'+j.assigned_pool.join(', ')+'</td><td class="mono">'+esc(j.started_at)+'</td><td>'+fmts(j.elapsed_seconds)+'</td><td class="mono">'+esc(j.next_status_update_expected)+'</td><td class="mono dim">'+esc(j.timeout_at)+'</td>'+runTokCell(j)+'</tr>').join(''):'<tr><td colspan="8" class="dim">nothing running</td></tr>';
  document.querySelector('#qd tbody').innerHTML=d.queued.length?d.queued.map(j=>'<tr><td class="mono">'+esc(j.job)+' <span class="b q">queued</span></td><td>'+j.tasks.map(t=>esc(t.task_id)).join('<br>')+'</td><td class="mono">'+esc(j.queued_at)+'</td><td>'+fmts(j.waiting_seconds)+'</td></tr>').join(''):'<tr><td colspan="4" class="dim">queue empty</td></tr>';
- document.querySelector('#hist tbody').innerHTML=d.history.length?d.history.map(h=>'<tr><td class="mono">'+esc(h.job)+'</td><td><span class="b '+(h.outcome==='ok'?'ok':'bad')+'\">'+h.outcome+'</span></td><td>'+h.tasks.map(t=>esc(t.task_id)+' · <span class="'+(t.status==='done'?'':'dim')+'\">'+esc(t.status)+'</span> · '+esc(t.turns)+'t · '+esc(t.assigned_to)).join('<br>')+'</td><td class="mono">'+esc(h.started||h.finished)+'</td><td>'+fmts(h.duration_seconds)+'</td><td class="dim">'+esc(h.reason)+'</td><td><details><summary>view</summary><pre data-job="'+esc(h.job)+'">loading…</pre></details></td></tr>').join(''):'<tr><td colspan="7" class="dim">no history yet</td></tr>';
+ document.querySelector('#hist tbody').innerHTML=d.history.length?d.history.map(h=>'<tr><td class="mono">'+esc(h.job)+'</td><td><span class="b '+(h.outcome==='ok'?'ok':'bad')+'">'+h.outcome+'</span></td><td>'+h.tasks.map(t=>esc(t.task_id)+' · <span class="'+(t.status==='done'?'':'dim')+'">'+esc(t.status)+'</span> · '+esc(t.turns)+'t · '+esc(t.assigned_to)).join('<br>')+'</td><td class="mono">'+esc(h.started||h.finished)+'</td><td>'+fmts(h.duration_seconds)+'</td>'+tokCell(h.usage_totals)+'<td class="dim">'+esc(h.reason)+'</td><td><details><summary>view</summary><pre data-job="'+esc(h.job)+'">loading…</pre></details></td></tr>').join(''):'<tr><td colspan="8" class="dim">no history yet</td></tr>';
  document.querySelectorAll('#hist details').forEach(el=>{el.addEventListener('toggle',async()=>{const pre=el.querySelector('pre');if(el.open&&pre.textContent==='loading…'){const rr=await fetch('/api/jobs/'+encodeURIComponent(pre.dataset.job),{headers:{Authorization:'Bearer '+T}});const dd=await rr.json();pre.textContent=dd.report_markdown||'(no report)';}},{once:false});});
 }
-tick();setInterval(tick,5000);
+document.getElementById('refresh').value=String(refreshSecs);
+document.getElementById('refresh').addEventListener('change',setRefresh);
+document.getElementById('refreshbtn').addEventListener('click',tick);
+tick();restartCountdown();
 </script></body></html>"""
+
+
+def page_html() -> str:
+    return PAGE.replace("__REFRESH_DEFAULT__", str(DASH_REFRESH_SECONDS))
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -215,7 +247,7 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == "/healthz":
             return self._send(200, b"ok", "text/plain")
         if u.path == "/" or u.path == "/index.html":
-            return self._send(200, PAGE.encode(), "text/html; charset=utf-8")
+            return self._send(200, page_html().encode(), "text/html; charset=utf-8")
         if not u.path.startswith("/api/"):
             return self._json(404, {"error": "not found"})
         if not self._authed_read(q):
