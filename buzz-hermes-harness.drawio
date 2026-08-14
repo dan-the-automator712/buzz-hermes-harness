@@ -1,255 +1,86 @@
-<mxfile host="app.diagrams.net">
-  <diagram id="d1" name="buzz-hermes-harness">
-    <mxGraphModel dx="3855" dy="2260" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1940" pageHeight="1440" math="0" shadow="0">
+<mxfile host="app.diagrams.net" modified="2026-08-14T00:00:00.000Z" agent="buzz-hermes-harness" version="24.0.0" type="device">
+  <diagram id="buzz-harness" name="buzz-hermes-harness">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2000" pageHeight="2400" math="0" shadow="0">
       <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-        <mxCell id="2" parent="1" style="rounded=1;dashed=1;dashPattern=8 4;fillColor=#F6F8FA;fontStyle=1;fontSize=15;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=-12;" value="DIZCORYZ — Harness Host (WSL)  ·  E:\HermesOutput\buzz-hermes-harness" vertex="1">
-          <mxGeometry height="780" width="900" x="30" y="50" as="geometry" />
-        </mxCell>
-        <mxCell id="3" parent="2" style="rounded=1;fillColor=#000000;strokeColor=none;pointerEvents=0;" vertex="1">
-          <mxGeometry height="10" width="10" as="geometry" />
-        </mxCell>
-        <mxCell id="4" parent="2" style="rounded=1;dashed=1;dashPattern=8 4;fillColor=none;fontStyle=1;fontSize=14;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=-12;" value="harness/ core modules" vertex="1">
-          <mxGeometry height="300" width="400" x="50" y="85" as="geometry" />
-        </mxCell>
-        <mxCell id="5" parent="4" style="rounded=1;fillColor=#000000;strokeColor=none;pointerEvents=0;" vertex="1">
-          <mxGeometry height="10" width="10" as="geometry" />
-        </mxCell>
-        <mxCell id="6" parent="4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F4FD;strokeColor=#4A90D9;fontSize=10;" value="orchestrator.py&#xa;(queen, dispatch)" vertex="1">
-          <mxGeometry height="38" width="175" x="65" y="115" as="geometry" />
-        </mxCell>
-        <mxCell id="7" parent="4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F4FD;strokeColor=#4A90D9;fontSize=10;" value="worker.py&#xa;(governed worker)" vertex="1">
-          <mxGeometry height="38" width="175" x="65" y="162" as="geometry" />
-        </mxCell>
-        <mxCell id="8" parent="4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F4FD;strokeColor=#4A90D9;fontSize=10;" value="run_worker.py&#xa;(standalone)" vertex="1">
-          <mxGeometry height="38" width="175" x="65" y="209" as="geometry" />
-        </mxCell>
-        <mxCell id="9" parent="4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F4FD;strokeColor=#4A90D9;fontSize=10;" value="buzz_bus.py&#xa;(sign/verify)" vertex="1">
-          <mxGeometry height="38" width="180" x="250" y="115" as="geometry" />
-        </mxCell>
-        <mxCell id="10" parent="4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F4FD;strokeColor=#4A90D9;fontSize=10;" value="governor.py&#xa;(5-turn + file)" vertex="1">
-          <mxGeometry height="38" width="180" x="250" y="162" as="geometry" />
-        </mxCell>
-        <mxCell id="11" parent="4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F4FD;strokeColor=#4A90D9;fontSize=10;" value="hermes_adapter.py&#xa;(hermes -z)" vertex="1">
-          <mxGeometry height="38" width="180" x="250" y="209" as="geometry" />
-        </mxCell>
-        <mxCell id="12" parent="4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F4FD;strokeColor=#4A90D9;fontSize=10;" value="check_setup.py" vertex="1">
-          <mxGeometry height="38" width="175" x="65" y="256" as="geometry" />
-        </mxCell>
-        <mxCell id="13" parent="4" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F4FD;strokeColor=#4A90D9;fontSize=10;" value="test_smoke.py" vertex="1">
-          <mxGeometry height="38" width="180" x="250" y="256" as="geometry" />
-        </mxCell>
-        <mxCell id="14" edge="1" parent="2" source="6" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="9" value="sign+publish">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="15" edge="1" parent="2" source="9" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="7" value="verify/fetch">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="16" edge="1" parent="2" source="7" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="11" value="run_turn()">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="17" edge="1" parent="2" source="7" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="10" value="evaluate()">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="18" parent="2" style="rounded=1;dashed=1;dashPattern=8 4;fillColor=none;fontStyle=1;fontSize=14;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=-12;" value="Config &amp; secrets" vertex="1">
-          <mxGeometry height="300" width="410" x="470" y="85" as="geometry" />
-        </mxCell>
-        <mxCell id="19" parent="18" style="rounded=1;fillColor=#000000;strokeColor=none;pointerEvents=0;" vertex="1">
-          <mxGeometry height="10" width="10" as="geometry" />
-        </mxCell>
-        <mxCell id="20" parent="18" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F8E8;strokeColor=#3D9B4D;fontSize=10;" value="config.yaml&#xa;(relay_url, model, pool)" vertex="1">
-          <mxGeometry height="40" width="185" x="485" y="115" as="geometry" />
-        </mxCell>
-        <mxCell id="21" parent="18" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F8E8;strokeColor=#3D9B4D;fontSize=10;" value=".env.example&#xa;(template)" vertex="1">
-          <mxGeometry height="40" width="185" x="485" y="165" as="geometry" />
-        </mxCell>
-        <mxCell id="22" parent="18" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBE4E4;strokeColor=#BF4B28;fontSize=10;" value="keys.json&#xa;(queen + 4 nsec)" vertex="1">
-          <mxGeometry height="40" width="185" x="680" y="115" as="geometry" />
-        </mxCell>
-        <mxCell id="23" parent="18" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBE4E4;strokeColor=#BF4B28;fontSize=10;" value="bridge/watcher.env&#xa;(PATH, token)" vertex="1">
-          <mxGeometry height="40" width="185" x="680" y="165" as="geometry" />
-        </mxCell>
-        <mxCell id="24" parent="18" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F8E8;strokeColor=#3D9B4D;fontSize=10;" value=".gitignore — secrets + runtime excluded" vertex="1">
-          <mxGeometry height="40" width="380" x="485" y="215" as="geometry" />
-        </mxCell>
-        <mxCell id="25" parent="18" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDF6E3;strokeColor=#C9A227;fontSize=10;" value="jobs.example.json / jobs.first.json" vertex="1">
-          <mxGeometry height="40" width="380" x="485" y="265" as="geometry" />
-        </mxCell>
-        <mxCell id="26" parent="2" style="rounded=1;dashed=1;dashPattern=8 4;fillColor=none;fontStyle=1;fontSize=14;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=-12;" value="bridge/ — chat ↔ harness communication files" vertex="1">
-          <mxGeometry height="410" width="830" x="50" y="400" as="geometry" />
-        </mxCell>
-        <mxCell id="27" parent="26" style="rounded=1;fillColor=#000000;strokeColor=none;pointerEvents=0;" vertex="1">
-          <mxGeometry height="10" width="10" as="geometry" />
-        </mxCell>
-        <mxCell id="28" parent="26" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F4FD;strokeColor=#4A90D9;fontSize=10;" value="watcher.py (daemon)" vertex="1">
-          <mxGeometry height="40" width="175" x="65" y="435" as="geometry" />
-        </mxCell>
-        <mxCell id="29" parent="26" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F8E8;strokeColor=#3D9B4D;fontSize=10;" value="hermes-bridge.service&#xa;(systemd)" vertex="1">
-          <mxGeometry height="40" width="175" x="65" y="485" as="geometry" />
-        </mxCell>
-        <mxCell id="30" parent="26" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F8E8;strokeColor=#3D9B4D;fontSize=10;" value="start-watcher.sh" vertex="1">
-          <mxGeometry height="40" width="175" x="65" y="535" as="geometry" />
-        </mxCell>
-        <mxCell id="31" parent="26" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDF6E3;strokeColor=#C9A227;fontSize=10;" value="inbox/ (jobs in)" vertex="1">
-          <mxGeometry height="40" width="130" x="255" y="435" as="geometry" />
-        </mxCell>
-        <mxCell id="32" parent="26" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDF6E3;strokeColor=#C9A227;fontSize=10;" value="processing/" vertex="1">
-          <mxGeometry height="40" width="130" x="400" y="435" as="geometry" />
-        </mxCell>
-        <mxCell id="33" parent="26" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDF6E3;strokeColor=#C9A227;fontSize=10;" value="outbox/ (OK_/PROBLEM_)" vertex="1">
-          <mxGeometry height="40" width="160" x="545" y="435" as="geometry" />
-        </mxCell>
-        <mxCell id="34" parent="26" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDF6E3;strokeColor=#C9A227;fontSize=10;" value="done/ (history)" vertex="1">
-          <mxGeometry height="40" width="130" x="255" y="500" as="geometry" />
-        </mxCell>
-        <mxCell id="35" parent="26" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDF6E3;strokeColor=#C9A227;fontSize=10;" value="status.json" vertex="1">
-          <mxGeometry height="40" width="130" x="400" y="500" as="geometry" />
-        </mxCell>
-        <mxCell id="36" parent="26" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDF6E3;strokeColor=#C9A227;fontSize=10;" value="watcher.log" vertex="1">
-          <mxGeometry height="40" width="160" x="545" y="500" as="geometry" />
-        </mxCell>
-        <mxCell id="37" parent="26" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=9;fontColor=#666;" value="inbox/outbox/processing/done CONTENTS + status.json + watcher.log + watcher.env&#xa;are GITIGNORED. Only .gitkeep placeholders + source (watcher.py, service,&#xa;start-watcher.sh, README, watcher.env.example) are tracked." vertex="1">
-          <mxGeometry height="90" width="640" x="65" y="580" as="geometry" />
-        </mxCell>
-        <mxCell id="38" edge="1" parent="2" source="31" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="28" value="pick up">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="39" edge="1" parent="2" source="28" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="32" value="move">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="40" edge="1" parent="2" source="28" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="33" value="write report">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="41" edge="1" parent="2" source="32" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="34" value="after">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="42" parent="2" style="rounded=1;dashed=1;dashPattern=8 4;fillColor=none;fontStyle=1;fontSize=14;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=-12;" value="Toolchain" vertex="1">
-          <mxGeometry height="160" width="410" x="470" y="400" as="geometry" />
-        </mxCell>
-        <mxCell id="43" parent="42" style="rounded=1;fillColor=#000000;strokeColor=none;pointerEvents=0;" vertex="1">
-          <mxGeometry height="10" width="10" as="geometry" />
-        </mxCell>
-        <mxCell id="69" parent="1" style="rounded=1;dashed=1;dashPattern=8 4;fillColor=#FDF6E3;fontStyle=1;fontSize=15;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=-12;" value="GitHub — dan-the-automator712/buzz-hermes-harness  (PRIVATE, bot-owned)" vertex="1">
-          <mxGeometry height="320" width="1520" x="30" y="1000" as="geometry" />
-        </mxCell>
-        <mxCell id="71" parent="69" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDF6E3;strokeColor=#C9A227;fontSize=10;" value="SYNCED (tracked, pushed):&#xa;· harness/*.py (all modules)&#xa;· harness/config.yaml · jobs*.json&#xa;· deploy/compose/{compose.yml,run.sh}&#xa;· deploy/nginx-proxy-manager/*&#xa;· bridge/{watcher.py,service,start,README,watcher.env.example}&#xa;· README.md · requirements.txt · .env.example · .gitignore" vertex="1">
-          <mxGeometry height="150" width="690" x="60" y="1040" as="geometry" />
-        </mxCell>
-        <mxCell id="70" parent="69" style="rounded=1;fillColor=#000000;strokeColor=none;pointerEvents=0;" vertex="1">
-          <mxGeometry height="10" width="10" as="geometry" />
-        </mxCell>
-        <mxCell id="72" parent="69" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBE4E4;strokeColor=#BF4B28;fontSize=10;" value="NOT SYNCED (gitignored):&#xa;· keys.json (nsec secrets)&#xa;· deploy/compose/.env (relay secrets)&#xa;· bridge/watcher.env · bridge/dashboard.token&#xa;· bridge/inbox,outbox,processing,done CONTENTS&#xa;· bridge/status.json · watcher.log · __pycache__&#xa;· .venv/ · proof.txt" vertex="1">
-          <mxGeometry height="150" width="740" x="780" y="1040" as="geometry" />
-        </mxCell>
-        <mxCell id="73" parent="69" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#555;" value="HOW:  git add -A → git commit → git push origin master  (WSL git, SSH to github.com).&#xa;.gitignore is the guard — only unmatched files commit; verify with `git check-ignore` + `git add -A --dry-run`." vertex="1">
-          <mxGeometry height="60" width="1460" x="60" y="1220" as="geometry" />
-        </mxCell>
-        <mxCell id="49" parent="1" style="rounded=1;dashed=1;dashPattern=8 4;fillColor=#EAF3EA;fontStyle=1;fontSize=15;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=-12;" value="docker01 — Relay Host (192.168.13.2)" vertex="1">
-          <mxGeometry height="620" width="560" x="990" y="50" as="geometry" />
-        </mxCell>
-        <mxCell id="50" parent="49" style="rounded=1;fillColor=#000000;strokeColor=none;pointerEvents=0;" vertex="1">
-          <mxGeometry height="10" width="10" as="geometry" />
-        </mxCell>
-        <mxCell id="51" parent="49" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D6E4F0;strokeColor=#2E6DA4;fontSize=12;fontStyle=1;" value="buzz-relay-1&#xa;Nostr relay + web UI&#xa;(host 9008→3000)" vertex="1">
-          <mxGeometry height="70" width="240" x="1010" y="90" as="geometry" />
-        </mxCell>
-        <mxCell id="52" parent="49" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDEDED;strokeColor=#888888;fontSize=11;" value="buzz-admin&#xa;add-member --pubkey &lt;hex&gt;" vertex="1">
-          <mxGeometry height="55" width="250" x="1010" y="175" as="geometry" />
-        </mxCell>
-        <mxCell id="53" parent="49" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDEDED;strokeColor=#888888;fontSize=11;" value="buzz-postgres-1 (PG17)" vertex="1">
-          <mxGeometry height="38" width="240" x="1010" y="245" as="geometry" />
-        </mxCell>
-        <mxCell id="54" parent="49" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDEDED;strokeColor=#888888;fontSize=11;" value="buzz-redis-1" vertex="1">
-          <mxGeometry height="38" width="200" x="1270" y="245" as="geometry" />
-        </mxCell>
-        <mxCell id="55" parent="49" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDEDED;strokeColor=#888888;fontSize=11;" value="buzz-minio-1 (S3)" vertex="1">
-          <mxGeometry height="38" width="240" x="1010" y="295" as="geometry" />
-        </mxCell>
-        <mxCell id="56" parent="49" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBE4E4;strokeColor=#BF4B28;fontSize=10;" value="deploy/compose/ .env (SECRET, gitignored)&#xa;compose.yml · run.sh · .env.example" vertex="1">
-          <mxGeometry height="55" width="460" x="1010" y="350" as="geometry" />
-        </mxCell>
-        <mxCell id="57" parent="49" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F8E8;strokeColor=#3D9B4D;fontSize=10;" value="Membership: queen=owner · worker-1..4=member&#xa;· desktop clients (npub→hex → add-member)" vertex="1">
-          <mxGeometry height="55" width="460" x="1010" y="420" as="geometry" />
-        </mxCell>
-        <mxCell id="58" parent="49" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDEDED;strokeColor=#888888;fontSize=11;" value="deploy/nginx-proxy-manager/ — NOT deployed&#xa;(planned HAProxy replacement)" vertex="1">
-          <mxGeometry height="55" width="460" x="1010" y="490" as="geometry" />
-        </mxCell>
-        <mxCell id="59" edge="1" parent="49" source="51" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="52" value="exec">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="60" edge="1" parent="49" source="51" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="53" value="DB">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="61" edge="1" parent="49" source="51" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="54" value="cache">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="62" edge="1" parent="49" source="51" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="55" value="media">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="63" parent="1" style="rounded=1;dashed=1;dashPattern=8 4;fillColor=#FBF0E9;fontStyle=1;fontSize=14;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=-12;" value="External access" vertex="1">
-          <mxGeometry height="260" width="560" x="990" y="700" as="geometry" />
-        </mxCell>
-        <mxCell id="64" parent="63" style="rounded=1;fillColor=#000000;strokeColor=none;pointerEvents=0;" vertex="1">
-          <mxGeometry height="10" width="10" as="geometry" />
-        </mxCell>
-        <mxCell id="65" parent="63" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D6E4F0;strokeColor=#2E6DA4;fontSize=12;fontStyle=1;" value="https://buzz.bhue.org&#xa;via HAProxy (172.16.5.2)&#xa;RELAY_URL=wss://buzz.bhue.org" vertex="1">
-          <mxGeometry height="60" width="250" x="1010" y="740" as="geometry" />
-        </mxCell>
-        <mxCell id="66" parent="63" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F4FD;strokeColor=#4A90D9;fontSize=10;" value="Buzz desktop app&#xa;(needs admin approval)" vertex="1">
-          <mxGeometry height="55" width="250" x="1010" y="815" as="geometry" />
-        </mxCell>
-        <mxCell id="67" parent="63" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDEDED;strokeColor=#888888;fontSize=11;" value="Cloudflare tunnel (token)&#xa;dashboard — not routing yet" vertex="1">
-          <mxGeometry height="60" width="250" x="1280" y="740" as="geometry" />
-        </mxCell>
-        <mxCell id="68" edge="1" parent="63" source="65" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="66" value="connect">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="44" parent="63" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDEDED;strokeColor=#888888;fontSize=11;" value="buzz-cli&#xa;~/.cargo/bin" vertex="1">
-          <mxGeometry height="40" width="120" x="50" y="70" as="geometry" />
-        </mxCell>
-        <mxCell id="45" parent="63" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDEDED;strokeColor=#888888;fontSize=11;" value="hermes&#xa;~/.local/bin" vertex="1">
-          <mxGeometry height="40" width="120" x="185" y="70" as="geometry" />
-        </mxCell>
-        <mxCell id="46" parent="63" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDEDED;strokeColor=#888888;fontSize=11;" value=".venv&#xa;(coincurve)" vertex="1">
-          <mxGeometry height="40" width="120" x="50" y="120" as="geometry" />
-        </mxCell>
-        <mxCell id="47" parent="63" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDEDED;strokeColor=#888888;fontSize=11;" value="git (WSL)&#xa;SSH→github" vertex="1">
-          <mxGeometry height="40" width="120" x="185" y="120" as="geometry" />
-        </mxCell>
-        <mxCell id="74" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontColor=#333;" value="Claude / operator (chat)  ↔  watcher bridge" vertex="1">
-          <mxGeometry height="22" width="300" x="30" y="20" as="geometry" />
-        </mxCell>
-        <mxCell id="75" edge="1" parent="1" source="74" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="31" value="drops job JSON">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="76" edge="1" parent="1" source="28" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="6" value="runs --jobs">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="77" edge="1" parent="1" source="6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;strokeColor=#2E6DA4;fontColor=#2E6DA4;" target="65" value="buzz-cli REST: signed task / progress / result">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="78" edge="1" parent="1" source="65" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="51" value="https → docker01 :9008">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="79" edge="1" parent="1" source="7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;strokeColor=#2E6DA4;fontColor=#2E6DA4;" target="65" value="fetch signed tasks / post results">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="80" edge="1" parent="1" source="9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="65" value="messages get (audit)">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="81" edge="1" parent="1" source="33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="74" value="report OK_/PROBLEM_">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="82" edge="1" parent="1" source="25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="71" value="commit + push (SSH)">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="83" edge="1" parent="1" source="56" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="49" value="copy bundle (manual/CIFS)">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="48" edge="1" parent="1" source="11" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;fontSize=10;" target="45" value="shell out -z">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
+<mxCell id="0" />
+<mxCell id="1" parent="0" />
+<mxCell id="band1" value="DIZCORYZ — Harness Host (WSL)  ·  E:\HermesOutput\buzz-hermes-harness" style="rounded=1;dashed=1;dashPattern=8 4;fillColor=#F0F4F8;fontStyle=1;fontSize=14;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=-10;" vertex="1" parent="1"><mxGeometry x="40" y="40" width="1920" height="324" as="geometry"/></mxCell>
+<mxCell id="band2" value="docker01  192.168.13.2  —  Dockhand-managed (dockhand2 container)" style="rounded=1;dashed=1;dashPattern=8 4;fillColor=#F3E8F6;fontStyle=1;fontSize=14;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=-10;" vertex="1" parent="1"><mxGeometry x="40" y="414" width="1920" height="228" as="geometry"/></mxCell>
+<mxCell id="band3" value="External" style="rounded=1;dashed=1;dashPattern=8 4;fillColor=#E0F2F1;fontStyle=1;fontSize=14;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=-10;" vertex="1" parent="1"><mxGeometry x="40" y="692" width="1920" height="132" as="geometry"/></mxCell>
+<mxCell id="band4" value="GitHub" style="rounded=1;dashed=1;dashPattern=8 4;fillColor=#E8EEF9;fontStyle=1;fontSize=14;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingTop=-10;" vertex="1" parent="1"><mxGeometry x="40" y="874" width="1920" height="132" as="geometry"/></mxCell>
+<mxCell id="opchat" value="Claude / operator chat" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band1"><mxGeometry x="20" y="46" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="inbox" value="bridge/inbox" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band1"><mxGeometry x="300" y="46" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="watcher" value="watcher.py
+(systemd hermes-bridge)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band1"><mxGeometry x="580" y="46" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="processing" value="bridge/processing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band1"><mxGeometry x="860" y="46" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="orchestrator" value="orchestrator.py
+(queen)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band1"><mxGeometry x="1140" y="46" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="buzz_bus" value="buzz_bus.py
+(Schnorr sign/verify +
+timestamp + author allowlist)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band1"><mxGeometry x="1420" y="46" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="worker" value="worker.py
+(governed worker)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band1"><mxGeometry x="20" y="142" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="governor" value="governor.py
+(5-turn cap + ground-truth
+file_exists / file_contains criteria)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band1"><mxGeometry x="300" y="142" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="hermes_adapter" value="hermes_adapter.py
+(hermes -m deepseek/deepseek-v4-flash-0731 -z --usage-file)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band1"><mxGeometry x="580" y="142" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="outbox" value="bridge/outbox
+(OK_ / PROBLEM_ reports)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band1"><mxGeometry x="860" y="142" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="done" value="bridge/done" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band1"><mxGeometry x="1140" y="142" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="keys" value="keys.json
+(queen + 4 worker nsec, GITIGNORED)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#EF6C00;fontSize=10;fontColor=#1F2328;dashed=1;dashPattern=8 4;" vertex="1" parent="band1"><mxGeometry x="1420" y="142" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="watcherenv" value="bridge/watcher.env
+(PATH + DASH tokens, GITIGNORED)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#EF6C00;fontSize=10;fontColor=#1F2328;dashed=1;dashPattern=8 4;" vertex="1" parent="band1"><mxGeometry x="20" y="238" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="publisher" value="publisher.py
+(systemd hermes-publisher)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band1"><mxGeometry x="300" y="238" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="relay" value="buzz-relay-1
+(host 9008 -&gt; 3000)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#8E24AA;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band2"><mxGeometry x="20" y="46" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="postgres" value="buzz-postgres-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#8E24AA;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band2"><mxGeometry x="300" y="46" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="redis" value="buzz-redis-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#8E24AA;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band2"><mxGeometry x="580" y="46" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="minio" value="buzz-minio-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#8E24AA;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band2"><mxGeometry x="860" y="46" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="minio_init" value="buzz-minio-init (one-shot)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#8E24AA;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band2"><mxGeometry x="1140" y="46" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="dashboard" value="buzz-dashboard-dashboard-1
+(host 9011 -&gt; 8787)
+volume dash-data -&gt; /data
+(snapshots.jsonl)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#8E24AA;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band2"><mxGeometry x="1420" y="46" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="dockhand" value="dockhand2 container
+(Dockhand-managed)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE7F6;strokeColor=#5E35B1;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band2"><mxGeometry x="20" y="142" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="haproxy" value="HAProxy 172.16.5.2
+buzz.bhue.org -&gt; relay:9008
+buzz-dashboard.bhue.org -&gt; dashboard:9011" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F7FA;strokeColor=#00838F;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band3"><mxGeometry x="20" y="46" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="cf_tunnel" value="Cloudflare tunnel
+(token-managed, not routing yet)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECEFF1;strokeColor=#546E7A;fontSize=10;fontColor=#1F2328;dashed=1;dashPattern=8 4;" vertex="1" parent="band3"><mxGeometry x="300" y="46" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="desktop" value="Buzz desktop app" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F7FA;strokeColor=#00838F;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band3"><mxGeometry x="580" y="46" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="opbrowser" value="operator browser" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F7FA;strokeColor=#00838F;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band3"><mxGeometry x="860" y="46" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="repo" value="private repo
+dan-the-automator712/buzz-hermes-harness" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8EAF6;strokeColor=#3949AB;fontSize=10;fontColor=#1F2328;fontStyle=1;" vertex="1" parent="band4"><mxGeometry x="20" y="46" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="synced" value="SYNCED:
+harness/*.py, bridge/*.py,
+deploy/**, jobs*.json" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band4"><mxGeometry x="300" y="46" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="notsynced" value="NOT SYNCED:
+keys.json, watcher.env,
+deploy/compose/.env, bridge runtime dirs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#C62828;fontSize=10;fontColor=#1F2328;" vertex="1" parent="band4"><mxGeometry x="580" y="46" width="250" height="66" as="geometry"/></mxCell>
+<mxCell id="legend" value="LEGEND  —  arrows show data flow; dashed outline = gitignored / not-synced / not-active" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#E0A800;fontSize=10;fontColor=#1F2328;fontStyle=1;dashed=1;dashPattern=8 4;fillColor=#FFF8E1;strokeColor=#E0A800;" vertex="1" parent="1"><mxGeometry x="60" y="1068" width="1880" height="66" as="geometry"/></mxCell>
+<mxCell id="e_opchat_inbox" value="drops job JSON" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#616161;endArrow=classic;" edge="1" parent="1" source="opchat" target="inbox"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e_inbox_watcher" value="poll" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#616161;endArrow=classic;" edge="1" parent="1" source="inbox" target="watcher"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e_watcher_processing" value="move" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#616161;endArrow=classic;" edge="1" parent="1" source="watcher" target="processing"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e_watcher_orchestrator" value="runs --jobs" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#616161;endArrow=classic;" edge="1" parent="1" source="watcher" target="orchestrator"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e_orchestrator_buzz_bus" value="build signed task" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#616161;endArrow=classic;" edge="1" parent="1" source="orchestrator" target="buzz_bus"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e_buzz_bus_relay" value="buzz-cli REST: signed+timestamped events" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#616161;endArrow=classic;" edge="1" parent="1" source="buzz_bus" target="relay"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e_relay_worker" value="verified task" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#616161;endArrow=classic;" edge="1" parent="1" source="relay" target="worker"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e_worker_governor" value="evaluate &lt;=5 turns" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#616161;endArrow=classic;" edge="1" parent="1" source="worker" target="governor"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e_worker_hermes_adapter" value="run_turn()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#616161;endArrow=classic;" edge="1" parent="1" source="worker" target="hermes_adapter"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e_worker_relay" value="signed progress/result" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#616161;endArrow=classic;" edge="1" parent="1" source="worker" target="relay"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e_watcher_outbox" value="write report" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#616161;endArrow=classic;" edge="1" parent="1" source="watcher" target="outbox"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e_outbox_opchat" value="OK_/PROBLEM_ + tokens" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#616161;endArrow=classic;" edge="1" parent="1" source="outbox" target="opchat"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e_processing_done" value="archive after run" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#616161;endArrow=classic;" edge="1" parent="1" source="processing" target="done"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e_outbox_publisher" value="reads bridge state (build_model, every 10s)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#616161;endArrow=classic;" edge="1" parent="1" source="outbox" target="publisher"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e_publisher_dashboard" value="POST /ingest (Bearer DASH_INGEST_TOKEN) every 10s" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#616161;endArrow=classic;" edge="1" parent="1" source="publisher" target="dashboard"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e_haproxy_dashboard" value="proxy dashboard:9011" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#616161;endArrow=classic;" edge="1" parent="1" source="haproxy" target="dashboard"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e_opbrowser_haproxy" value="https buzz-dashboard.bhue.org (Bearer DASH_TOKEN)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#616161;endArrow=classic;" edge="1" parent="1" source="opbrowser" target="haproxy"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e_haproxy_relay" value="proxy relay:9008" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#616161;endArrow=classic;" edge="1" parent="1" source="haproxy" target="relay"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e_desktop_haproxy" value="connect" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=#616161;endArrow=classic;" edge="1" parent="1" source="desktop" target="haproxy"><mxGeometry relative="1" as="geometry"/></mxCell>
       </root>
     </mxGraphModel>
   </diagram>
