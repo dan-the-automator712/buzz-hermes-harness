@@ -1,0 +1,31 @@
+# systemd unit for the bridge publisher (periodic snapshot -> ingest endpoint).
+# Install:
+#   sudo cp bridge/hermes-publisher.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now hermes-publisher
+# Check:   systemctl status hermes-publisher   ·   journalctl -u hermes-publisher -f
+#
+# Set DASH_INGEST_TOKEN and optionally DASH_URL/PUBLISH_INTERVAL in watcher.env
+# (the same EnvironmentFile the watcher uses) or as Environment= overrides below.
+#
+# Adjust the paths/User below to match your box if they differ.
+
+[Unit]
+Description=Buzz x Hermes bridge snapshot publisher
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dizcofuz
+WorkingDirectory=/mnt/e/HermesOutput/buzz-hermes-harness
+# PATH must include buzz-cli (~/.cargo/bin) and hermes. EnvironmentFile is optional
+# (the leading - means "ok if missing") — put DASH_INGEST_TOKEN / overrides there.
+Environment=PATH=/home/dizcofuz/.cargo/bin:/usr/local/bin:/usr/bin:/bin
+EnvironmentFile=-/mnt/e/HermesOutput/buzz-hermes-harness/bridge/watcher.env
+ExecStart=/mnt/e/HermesOutput/buzz-hermes-harness/.venv/bin/python /mnt/e/HermesOutput/buzz-hermes-harness/bridge/publisher.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

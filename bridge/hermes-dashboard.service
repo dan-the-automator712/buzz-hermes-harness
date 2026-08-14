@@ -1,0 +1,26 @@
+# systemd unit for the bridge dashboard (web UI + JSON API, read-only).
+# Install:
+#   sudo cp bridge/hermes-dashboard.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now hermes-dashboard
+# Then browse http://localhost:8787 (token: bridge/dashboard.token or DASH_TOKEN).
+
+[Unit]
+Description=Buzz x Hermes bridge dashboard (web + API)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dizcofuz
+WorkingDirectory=/mnt/e/HermesOutput/buzz-hermes-harness
+Environment=DASH_BIND=0.0.0.0
+Environment=DASH_PORT=8787
+# Optional: set DASH_TOKEN here or in watcher.env; otherwise bridge/dashboard.token is used.
+EnvironmentFile=-/mnt/e/HermesOutput/buzz-hermes-harness/bridge/watcher.env
+ExecStart=/mnt/e/HermesOutput/buzz-hermes-harness/.venv/bin/python /mnt/e/HermesOutput/buzz-hermes-harness/bridge/dashboard.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

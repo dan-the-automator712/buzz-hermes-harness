@@ -1,0 +1,37 @@
+# buzz-dashboard — containerized snapshot dashboard (web UI + JSON API).
+# Deployed on docker01 as a NEW stack alongside (but separate from) the buzz relay.
+# The DIZCORYZ box pushes snapshots into the container; the container serves them.
+#
+# Port 9009 is the free host port on docker01 (9008 = relay, 9009 = prowlarr2, 9010 assumed reserved).
+#   - Do NOT touch the relay stack / its port.
+#   - Host port 9009 -> container port 8787 (dashboard.py default DASH_PORT).
+#
+# Env vars required at deploy time (the ${VAR:?set VAR} form fails fast if unset):
+#   DASH_TOKEN        read token for the web UI + JSON API
+#   DASH_INGEST_TOKEN token the publisher uses to POST snapshots
+
+name: buzz-dashboard
+
+services:
+  dashboard:
+    image: python:3.12-alpine
+    command: ['python', '/srv/server.py']
+    volumes:
+      - ./server.py:/srv/server.py:ro
+      - dash-data:/data
+    ports:
+      - '9011:8787'
+    environment:
+      DASH_TOKEN: ${DASH_TOKEN:?set DASH_TOKEN}
+      DASH_INGEST_TOKEN: ${DASH_INGEST_TOKEN:?set DASH_INGEST_TOKEN}
+    healthcheck:
+      # python:3.12-alpine has no wget/curl, so probe /healthz with urllib.
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8787/healthz', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  dash-data:

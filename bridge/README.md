@@ -66,3 +66,34 @@ You don't touch this folder. You talk to Claude:
 - *"What's the status?"* → Claude reads `status.json` and the latest reports.
 
 To pause everything: `sudo systemctl stop hermes-bridge` (or Ctrl-C the terminal).
+
+## Dashboard (web UI + JSON API)
+
+`bridge/dashboard.py` serves a read-only live dashboard of the bridge: running and
+queued jobs (with elapsed time and estimated next update), watcher heartbeat, and
+the full job history with per-task status, turns, worker attribution, and the
+original reports — plus a token-gated JSON API for outside automations.
+
+```bash
+sudo cp bridge/hermes-dashboard.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now hermes-dashboard
+```
+
+Browse **http://localhost:8787** (or `http://<DIZCORYZ-LAN-IP>:8787`). The page asks
+once for the API token: set `DASH_TOKEN` in `bridge/watcher.env`, or use the
+auto-generated `bridge/dashboard.token` (chmod 600, gitignored).
+
+API (send `Authorization: Bearer <token>` or `?token=<token>`):
+
+| Endpoint | Returns |
+|----------|---------|
+| `GET /api/all` | everything in one payload |
+| `GET /api/status` | watcher heartbeat/state |
+| `GET /api/jobs` | queued + running |
+| `GET /api/history` | finished jobs, newest first |
+| `GET /api/jobs/<name>` | one job incl. full report markdown |
+
+The server reads only public identity fields (names/pubkeys) — never nsec keys.
+WSL note: Windows reaches WSL via localhost automatically; for other LAN devices
+add a portproxy (`netsh interface portproxy add v4tov4 listenport=8787 connectport=8787 connectaddress=<wsl-ip>`).

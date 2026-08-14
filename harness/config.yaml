@@ -36,7 +36,7 @@ hermes:
   # if needed. {model} and {prompt} are substituted (prompt passed inline as one argv).
   # This Hermes build uses top-level `hermes -z PROMPT -m MODEL` (NOT `hermes run`).
   cli_template: "hermes -m {model} -z {prompt}"
-  cli_timeout: 600
+  cli_timeout: 1800
 
   # openai_compat: hosted provider serving the model (fill in your endpoint)
   base_url: "https://openrouter.ai/api/v1"
