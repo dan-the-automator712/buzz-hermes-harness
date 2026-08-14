@@ -1,0 +1,33 @@
+# --- SECRETS: never commit ---
+keys.json
+keys.json.SAMPLE-DELETE-ME
+*.nsec
+.env
+.env.*
+!.env.example
+
+# per-worker processed-task state
+.seen-*.json
+
+# deploy secrets
+deploy/compose/.env
+deploy/**/.env
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# --- OS / editor cruft ---
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# --- scratch ---
+*.log
+proof.txt

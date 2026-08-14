@@ -1,0 +1,3 @@
+coincurve>=19.0.0     # BIP-340 Schnorr keygen + signature verification
+PyYAML>=6.0
+requests>=2.31        # only needed for the openai_compat Hermes backend

@@ -1,0 +1,15 @@
+{
+  "jobs": [
+    {
+      "task_id": "hello-buzz",
+      "goal": "Work in the harness repository root. Create a file named proof.txt containing the line 'STATUS: done' plus a one-line note that this task was dispatched over the Buzz relay at https://buzz.bhue.org by the queen and executed by a Hermes worker. End your reply with the line `STATUS: done`.",
+      "workdir": "/mnt/e/TEMP/HermesTemp/projects",
+      "max_turns": 5,
+      "require_all": true,
+      "success_criteria": [
+        {"kind": "contains", "value": "STATUS: done"},
+        {"kind": "contains", "value": "proof.txt"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+# Buzz + Hermes agentic harness — configuration
+#
+# The relay is your signed, timestamped message bus. Hermes (running
+# deepseek-v4-flash-0731) is the agent. The queen dispatches signed tasks; workers
+# run them under a hard 5-turn budget.
+
+relay_url: "https://buzz.bhue.org"      # buzz-cli REST endpoint (http/https, NOT wss)
+# channel_id: "<uuid>"                    # set to reuse a channel; else created by name
+channel_name: "hive-tasks"
+
+identities_file: "keys.json"             # produced by gen_keys.py — KEEP SECRET
+
+# --- governance -----------------------------------------------------------
+max_turns: 5                             # hard cap per task before a checkpoint
+worker_pool: 4                           # in-process parallelism (default run mode)
+checkpoint_policy: "stop"                # "stop" | "grant_once"
+grant_extra_turns: 5                     # only used when policy == grant_once
+
+# --- distributed workers (run_worker.py) ----------------------------------
+# Used when you run standalone worker processes instead of the in-process pool.
+claim_mode: "assigned"                   # "assigned" (queen routes) | "pull" (first claim wins)
+poll_interval: 5                         # seconds between channel polls
+fetch_limit: 200                         # events scanned per poll
+
+# --- verification hardening ----------------------------------------------
+# Set env HARNESS_REQUIRE_SIG=1 to REFUSE any event whose full Nostr fields
+# (and thus Schnorr signature) can't be independently verified — no silent
+# fallback to relay-only trust.
+
+# --- Hermes model backend -------------------------------------------------
+hermes:
+  backend: "hermes_cli"                  # "hermes_cli" (real) | "openai_compat" (smoke test)
+  model: "deepseek/deepseek-v4-flash-0731"   # provider-qualified — CLI needs this form, NOT bare "deepseek-v4-flash-0731"
+
+  # hermes_cli: confirm the one-shot flag against your `hermes --help` and edit
+  # if needed. {model} and {prompt} are substituted (prompt passed inline as one argv).
+  # This Hermes build uses top-level `hermes -z PROMPT -m MODEL` (NOT `hermes run`).
+  cli_template: "hermes -m {model} -z {prompt}"
+  cli_timeout: 600
+
+  # openai_compat: hosted provider serving the model (fill in your endpoint)
+  base_url: "https://openrouter.ai/api/v1"
+  api_key_env: "HERMES_MODEL_API_KEY"
+  request_timeout: 300

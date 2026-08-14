@@ -1,0 +1,22 @@
+name: npm
+
+services:
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:2.15.1
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    ports:
+      - "80:80"        # HTTP
+      - "81:81"        # NPM Admin UI
+      - "443:443"      # HTTPS
+    volumes:
+      - /media/share/dockerhost01/nginx-proxy-manager/data:/data
+      - /media/share/dockerhost01/nginx-proxy-manager/letsencrypt:/etc/letsencrypt
+    environment:
+      - TZ=America/Chicago
+    networks:
+      - dockernet
+
+networks:
+  dockernet:
+    external: true
