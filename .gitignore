@@ -31,3 +31,14 @@ Thumbs.db
 # --- scratch ---
 *.log
 proof.txt
+
+# --- bridge runtime (keep the folders, ignore their contents) ---
+bridge/inbox/*
+bridge/outbox/*
+bridge/processing/*
+bridge/done/*
+!bridge/**/.gitkeep
+bridge/status.json
+bridge/watcher.lock
+bridge/watcher.out
+bridge/watcher.env

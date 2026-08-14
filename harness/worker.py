@@ -18,6 +18,7 @@ output by keypair — exactly Buzz's model (agents are members, not bots).
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import dataclass
 from typing import Optional
 
@@ -49,8 +50,11 @@ def _build_prompt(goal: str, criteria_spec: list[dict], history: list[str], turn
         lines += ["", "Continue from where the previous turn left off. Do not repeat completed work."]
     lines += [
         "",
-        "Produce the next increment of work now. If the success criteria are fully met, "
-        "state that explicitly and end with `STATUS: done`.",
+        "Actually DO the work using your tools — run commands and write files to disk in "
+        "the working directory. Do not just describe or paste what the output would be; "
+        "the task is judged on the real files existing on disk, not on your narration. "
+        "After creating a file, verify it (e.g. `ls`/`cat`). If the success criteria are "
+        "fully met, state that explicitly and end with `STATUS: done`.",
     ]
     return "\n".join(lines)
 
@@ -87,7 +91,15 @@ def run_worker_task(
         criteria=criteria_from_spec(criteria_spec),
         max_turns=max_turns,
         require_all=bool(task_env.get("require_all", True)),
+        workdir=task_env.get("workdir"),   # base for file_* ground-truth checks
     )
+
+    # Make sure the target workdir exists so the agent can write into it.
+    if state.workdir:
+        try:
+            os.makedirs(state.workdir, exist_ok=True)
+        except OSError:
+            pass
 
     last_output = ""
     while True:

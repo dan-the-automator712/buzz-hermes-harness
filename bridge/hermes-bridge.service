@@ -1,0 +1,28 @@
+# systemd unit for the bridge watcher (WSL with systemd, or any Linux host).
+# Install:
+#   sudo cp bridge/hermes-bridge.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now hermes-bridge
+# Check:   systemctl status hermes-bridge   ·   journalctl -u hermes-bridge -f
+#
+# Adjust the paths/User below to match your box if they differ.
+
+[Unit]
+Description=Buzz x Hermes chat bridge watcher
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dizcofuz
+WorkingDirectory=/mnt/e/HermesOutput/buzz-hermes-harness
+# PATH must include buzz-cli (~/.cargo/bin) and hermes. EnvironmentFile is optional
+# (the leading - means "ok if missing") — put BUZZ_AUTH_TOKEN / PATH overrides there.
+Environment=PATH=/home/dizcofuz/.cargo/bin:/usr/local/bin:/usr/bin:/bin
+EnvironmentFile=-/mnt/e/HermesOutput/buzz-hermes-harness/bridge/watcher.env
+ExecStart=/mnt/e/HermesOutput/buzz-hermes-harness/.venv/bin/python /mnt/e/HermesOutput/buzz-hermes-harness/bridge/watcher.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

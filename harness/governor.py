@@ -22,6 +22,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from enum import Enum
+from pathlib import Path
 from typing import Any, Callable, Optional
 
 
@@ -33,14 +34,26 @@ class Decision(str, Enum):
 
 @dataclass
 class Criterion:
-    """One success test. `kind` selects how `value` is interpreted."""
-    kind: str          # "contains" | "regex" | "json_path_eq" | "predicate"
+    """
+    One success test. `kind` selects how it is evaluated.
+
+    Text criteria grade the model's REPLY (can be faked by narration):
+        contains | regex | json_path_eq | predicate
+    Ground-truth criteria grade the real FILESYSTEM in the task's workdir — a model
+    that only *says* it did the work fails these:
+        file_exists   -> value: relative path that must exist (and be non-empty)
+        file_contains -> path: file, value: substring that must be in it
+        file_regex    -> path: file, value: regex that must match its contents
+    """
+    kind: str
     value: Any
-    # for json_path_eq: dotted path into a parsed-JSON result, compared == expected
+    # for json_path_eq: dotted path into parsed JSON, compared == expected
+    # for file_contains/file_regex: `path` is the file (relative to workdir)
     path: Optional[str] = None
     expected: Any = None
 
-    def check(self, output: str, parsed: Optional[dict]) -> Optional[bool]:
+    def check(self, output: str, parsed: Optional[dict],
+              workdir: Optional[str] = None) -> Optional[bool]:
         """Return True/False, or None if this criterion can't judge (inconclusive)."""
         if self.kind == "contains":
             return str(self.value) in output
@@ -57,8 +70,27 @@ class Criterion:
                     return False
             return cur == self.expected
         if self.kind == "predicate":
-            # value is a callable(output, parsed) -> bool
             return bool(self.value(output, parsed))
+
+        # --- ground-truth (filesystem) checks ---
+        if self.kind in ("file_exists", "file_contains", "file_regex"):
+            rel = self.path if self.kind != "file_exists" else self.value
+            base = Path(workdir) if workdir else Path.cwd()
+            target = (base / str(rel)) if rel else base
+            if self.kind == "file_exists":
+                try:
+                    return target.is_file() and target.stat().st_size > 0
+                except OSError:
+                    return False
+            if not target.is_file():
+                return False
+            try:
+                text = target.read_text(errors="replace")
+            except OSError:
+                return False
+            if self.kind == "file_contains":
+                return str(self.value) in text
+            return re.search(str(self.value), text, re.MULTILINE | re.DOTALL) is not None
         return None
 
 
@@ -69,6 +101,7 @@ class TaskState:
     criteria: list[Criterion]
     max_turns: int = 5
     require_all: bool = True         # all criteria vs. any criterion
+    workdir: Optional[str] = None    # base dir for file_* ground-truth checks
     turn: int = 0
     history: list[str] = field(default_factory=list)
 
@@ -97,7 +130,7 @@ class Governor:
             # otherwise never auto-complete (force a checkpoint at budget).
             return bool(self.judge and self.judge(state.goal, output))
 
-        results = [c.check(output, parsed) for c in state.criteria]
+        results = [c.check(output, parsed, state.workdir) for c in state.criteria]
         decisive = [r for r in results if r is not None]
 
         if state.require_all:

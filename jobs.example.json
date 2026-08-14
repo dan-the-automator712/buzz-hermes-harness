@@ -1,39 +1,40 @@
 {
-  "_comment": "Self-contained starter jobs: each creates its own inputs, so none depend on pre-existing fixtures. workdir targets the deployed projects dir (E:\\TEMP\\HermesTemp\\projects). Keep max_turns at 5.",
+  "_comment": "Self-contained starter jobs. Success is graded on REAL FILES on disk (file_exists/file_contains), not the model's narration — so a task only passes if the artifact actually exists in the workdir. workdir targets the deployed projects dir. Keep max_turns at 5.",
   "jobs": [
     {
       "task_id": "env-report",
-      "goal": "In the working directory, gather basic environment facts (OS/kernel via `uname -a`, Python version, current directory, and free disk space) and write them to `env-report.md` with a level-1 heading '# Environment Report' and one section per fact. Then print the file contents. Finish with `STATUS: done` once env-report.md exists and contains all four sections.",
+      "goal": "Gather basic environment facts (OS/kernel via `uname -a`, Python version, current directory, and free disk space via `df -h .`) and write them to the ABSOLUTE path `/mnt/e/TEMP/HermesTemp/projects/env-report.md` with a level-1 heading '# Environment Report' and one section per fact. Use your terminal/file tools to actually create the file at that exact path, then `cat /mnt/e/TEMP/HermesTemp/projects/env-report.md` to confirm it exists. Finish with `STATUS: done`.",
       "workdir": "/mnt/e/TEMP/HermesTemp/projects",
       "max_turns": 5,
       "require_all": true,
       "success_criteria": [
-        {"kind": "contains", "value": "env-report.md"},
-        {"kind": "regex", "value": "# Environment Report"},
-        {"kind": "contains", "value": "STATUS: done"}
+        {"kind": "file_exists", "value": "env-report.md"},
+        {"kind": "file_contains", "path": "env-report.md", "value": "# Environment Report"},
+        {"kind": "file_regex", "path": "env-report.md", "value": "Linux|GNU|x86_64"}
       ]
     },
     {
       "task_id": "fizzbuzz-tested",
-      "goal": "Create a self-contained Python project in the working directory: `fizzbuzz.py` with a `fizzbuzz(n)` function (returns 'Fizz'/'Buzz'/'FizzBuzz'/str(n)), and `test_fizzbuzz.py` with pytest cases covering 3, 5, 15, and 7. Run `python -m pytest -q` and report the result. Finish with `STATUS: done` only when the tests pass.",
+      "goal": "Create a self-contained Python project under the ABSOLUTE directory `/mnt/e/TEMP/HermesTemp/projects/fizzbuzz/` (create it if needed): `fizzbuzz.py` with a `fizzbuzz(n)` function (returns 'Fizz'/'Buzz'/'FizzBuzz'/str(n)), and `test_fizzbuzz.py` with pytest cases covering 3, 5, 15, and 7. Use your tools to actually write both files at those absolute paths, then run `python -m pytest -q` in that directory and show the output. Finish with `STATUS: done` only when the tests pass.",
       "workdir": "/mnt/e/TEMP/HermesTemp/projects/fizzbuzz",
       "max_turns": 5,
       "require_all": true,
       "success_criteria": [
-        {"kind": "regex", "value": "def test_"},
-        {"kind": "regex", "value": "passed"},
-        {"kind": "contains", "value": "STATUS: done"}
+        {"kind": "file_exists", "value": "fizzbuzz.py"},
+        {"kind": "file_exists", "value": "test_fizzbuzz.py"},
+        {"kind": "file_regex", "path": "test_fizzbuzz.py", "value": "def test_"},
+        {"kind": "regex", "value": "passed"}
       ]
     },
     {
       "task_id": "summarize-readme",
-      "goal": "Read the harness README at /mnt/e/HermesOutput/buzz-hermes-harness/README.md and write a 5-bullet plain-language summary to `readme-summary.md` in the working directory. Each bullet <= 2 sentences. Finish with `STATUS: done` once readme-summary.md has exactly 5 bullets.",
+      "goal": "Read the harness README at /mnt/e/HermesOutput/buzz-hermes-harness/README.md and write a 5-bullet plain-language summary to the ABSOLUTE path `/mnt/e/TEMP/HermesTemp/projects/readme-summary.md`. Each bullet <= 2 sentences. Use your tools to actually create the file at that exact path. Finish with `STATUS: done`.",
       "workdir": "/mnt/e/TEMP/HermesTemp/projects",
       "max_turns": 5,
-      "require_all": false,
+      "require_all": true,
       "success_criteria": [
-        {"kind": "contains", "value": "readme-summary.md"},
-        {"kind": "contains", "value": "STATUS: done"}
+        {"kind": "file_exists", "value": "readme-summary.md"},
+        {"kind": "file_regex", "path": "readme-summary.md", "value": "(?s)([-*].*){5}"}
       ]
     }
   ]
