@@ -42,3 +42,11 @@ bridge/status.json
 bridge/watcher.lock
 bridge/watcher.out
 bridge/watcher.env
+
+# --- session / working docs: live in the temp work dir, NOT the repo ---
+/BUZZ_DEPLOYMENT_STATUS.md
+/HERMES_SETUP.md
+/FINDINGS_AND_FIXES_*.md
+/BUZZ_WIKI_REVIEW*.md
+/*_STATUS.md
+/*_REVIEW*.md
