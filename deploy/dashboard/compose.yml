@@ -18,6 +18,7 @@ services:
     command: ['python', '/srv/server.py']
     volumes:
       - ./server.py:/srv/server.py:ro
+      - ./static:/srv/static:ro
       - dash-data:/data
     ports:
       - '9011:8787'

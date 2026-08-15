@@ -22,6 +22,7 @@ Run:  .venv/bin/python bridge/dashboard.py     (env: DASH_PORT=8787, DASH_BIND=0
 
 from __future__ import annotations
 
+import base64
 import hmac
 import json
 import os
@@ -42,6 +43,59 @@ JOB_TIMEOUT = int(os.environ.get("BRIDGE_JOB_TIMEOUT", "3600"))
 BIND = os.environ.get("DASH_BIND", "0.0.0.0")
 PORT = int(os.environ.get("DASH_PORT", "8787"))
 DASH_REFRESH_SECONDS = int(os.environ.get("DASH_REFRESH_SECONDS", "60"))
+
+# Directory of static assets served at /static/<name>. Defaults to the repo's
+# deploy/dashboard/static so the local (non-container) UI serves the same file
+# the container does. Override with DASH_STATIC_DIR when testing.
+STATIC_DIR = Path(os.environ.get("DASH_STATIC_DIR", ROOT / "deploy" / "dashboard" / "static"))
+
+# Static content-type map (basename extension -> MIME). Anything unknown is
+# served as application/octet-stream.
+STATIC_TYPES = {
+    ".svg": "image/svg+xml",
+    ".ico": "image/x-icon",
+    ".png": "image/png",
+    ".css": "text/css",
+    ".js": "application/javascript",
+}
+STATIC_NAME_RE = re.compile(r"^[A-Za-z0-9._-]+$")
+
+
+def serve_static(handler, name: str):
+    """Serve one file from STATIC_DIR, securely.
+
+    Rules:
+      * basename must match ^[A-Za-z0-9._-]+$  (rejects '/' and '..')
+      * after resolving, the real path must still live inside STATIC_DIR
+      * extension maps to a content type (default application/octet-stream)
+      * Cache-Control: public, max-age=86400
+    Returns None if the request is rejected or the file is missing (the caller
+    decides the status/body).
+    """
+    if not STATIC_NAME_RE.match(name):
+        return None
+    base = STATIC_DIR.resolve()
+    candidate = (base / name).resolve()
+    if not candidate.is_relative_to(base) or not candidate.is_file():
+        return None
+    body = candidate.read_bytes()
+    ctype = STATIC_TYPES.get(candidate.suffix.lower(), "application/octet-stream")
+    handler.send_response(200)
+    handler.send_header("Content-Type", ctype)
+    handler.send_header("Cache-Control", "public, max-age=86400")
+    handler.send_header("Content-Length", str(len(body)))
+    handler.end_headers()
+    handler.wfile.write(body)
+    return True
+
+
+# Official Buzz favicon embedded as base64 so it ships inside this single
+# file (the container bind-mounts only the .py source). Source:
+# https://buzz.xyz/sites/buzz/icon.svg (HTTP 200, 1273 bytes, image/svg+xml)
+FAVICON_MIME = "image/svg+xml"
+FAVICON_B64 = "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NjYgMzA5IiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiPgogIDwhLS0gQnV6eiBiZWUgbWFyayBmYXZpY29uIOKAlCBUUkFOU1BBUkVOVCBiYWNrZ3JvdW5kIHNvIGl0IGZsb2F0cyBvbiB0aGUKICAgICAgIGJyb3dzZXIgY2hyb21lLiBDb2xvciBhZGFwdHMgdG8gdGhlIGJyb3dzZXIncyBjb2xvciBzY2hlbWUgdmlhIHRoZQogICAgICAgZW1iZWRkZWQgbWVkaWEgcXVlcnk6IGluayAoYmxhY2spIGluIGxpZ2h0IG1vZGUsIGNoYXJ0cmV1c2UgKHRoZSB0b3AKICAgICAgIGNvbG9yIG9mIHRoZSBzaXRlIGdyYWRpZW50KSBpbiBkYXJrIG1vZGUuIEdlb21ldHJ5IG1hdGNoZXMgdGhlIGNocm9tZQogICAgICAgYmVlIGxvZ28gaW4gQ2hyb21lLnRzeCAodHdvIHNpZGUgY2lyY2xlcyArIHJvdW5kZWQgYm9keSwgd2l0aCBleWVzIGFuZAogICAgICAgc2xvdHMga25vY2tlZCBvdXQgYnkgdGhlIG1hc2spLiAtLT4KICA8c3R5bGU+CiAgICAubWFyayB7IGZpbGw6ICMyMzFlMWU7IH0KICAgIEBtZWRpYSAocHJlZmVycy1jb2xvci1zY2hlbWU6IGRhcmspIHsKICAgICAgLm1hcmsgeyBmaWxsOiAjZDdkNzJlOyB9CiAgICB9CiAgPC9zdHlsZT4KICA8ZGVmcz4KICAgIDxtYXNrIGlkPSJiZWUtbWFzayI+CiAgICAgIDxjaXJjbGUgY3g9IjkxLjciIGN5PSIxNTQuNSIgcj0iOTEuNyIgZmlsbD0id2hpdGUiLz4KICAgICAgPGNpcmNsZSBjeD0iMzc0LjMiIGN5PSIxNTQuNSIgcj0iOTEuNyIgZmlsbD0id2hpdGUiLz4KICAgICAgPHJlY3QgeD0iMTI4IiB5PSIwIiB3aWR0aD0iMjEwIiBoZWlnaHQ9IjMwOSIgcng9IjM0IiBmaWxsPSJ3aGl0ZSIvPgogICAgICA8ZWxsaXBzZSBjeD0iMTkzLjMiIGN5PSI4NC40IiByeD0iMjciIHJ5PSIyNyIgZmlsbD0iYmxhY2siLz4KICAgICAgPGVsbGlwc2UgY3g9IjI3NiIgY3k9Ijg0LjQiIHJ4PSIyNyIgcnk9IjI3IiBmaWxsPSJibGFjayIvPgogICAgICA8cmVjdCB4PSIxNjYuMyIgeT0iMTU3LjIiIHdpZHRoPSIxMzYuOSIgaGVpZ2h0PSIzOC4zIiByeD0iNSIgZmlsbD0iYmxhY2siLz4KICAgICAgPHJlY3QgeD0iMTY2LjkiIHk9IjIzNS4xIiB3aWR0aD0iMTM2LjIiIGhlaWdodD0iMzcuNiIgcng9IjUiIGZpbGw9ImJsYWNrIi8+CiAgICA8L21hc2s+CiAgPC9kZWZzPgogIDxyZWN0IGNsYXNzPSJtYXJrIiB4PSIwIiB5PSIwIiB3aWR0aD0iNDY2IiBoZWlnaHQ9IjMwOSIgbWFzaz0idXJsKCNiZWUtbWFzaykiLz4KPC9zdmc+Cg=="
+FAVICON_BYTES = base64.b64decode(FAVICON_B64)
+
 
 
 def get_token() -> str:
@@ -303,6 +357,7 @@ def build_model() -> dict:
 # ---------------------------------------------------------------- HTTP layer
 
 PAGE = """<!doctype html><html><head><meta charset="utf-8">
+<link rel="icon" href="/favicon.ico">
 <title>Buzz × Hermes — Bridge Dashboard</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
@@ -414,6 +469,25 @@ class Handler(BaseHTTPRequestHandler):
         q = parse_qs(u.query)
         if u.path == "/" or u.path == "/index.html":
             return self._send(200, page_html().encode(), "text/html; charset=utf-8")
+        m = re.match(r"^/static/([^/]+)$", u.path)
+        if m:
+            if serve_static(self, m.group(1)) is None:
+                return self._json(404, {"error": "not found"})
+            return
+        if u.path == "/favicon.ico":
+            # Prefer the static dir (favicon.svg then favicon.ico); fall back
+            # to the embedded base64 bytes if the dir/file is missing.
+            for fname in ("favicon.svg", "favicon.ico"):
+                if serve_static(self, fname) is not None:
+                    return
+            self.send_response(200)
+            self.send_header("Content-Type", FAVICON_MIME)
+            self.send_header("Cache-Control", "public, max-age=86400")
+            self.send_header("Content-Length", str(len(FAVICON_BYTES)))
+            self.end_headers()
+            self.wfile.write(FAVICON_BYTES)
+            return
+
         if not u.path.startswith("/api/"):
             return self._json(404, {"error": "not found"})
         if not self._authed(q):
