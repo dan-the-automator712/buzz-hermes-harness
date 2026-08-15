@@ -180,6 +180,7 @@ def resolve_job(snapshot: dict, name: str) -> dict | None:
 
 PAGE = """<!doctype html><html><head><meta charset="utf-8">
 <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png">
 <link rel="alternate icon" href="/favicon.ico">
 <title>Buzz × Hermes — Bridge Dashboard</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
